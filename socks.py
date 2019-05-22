@@ -1,13 +1,11 @@
-from threading import Thread, Lock, enumerate
+from threading import Thread, Lock
 from socket import *
-from time import ctime
+from time import ctime, sleep
 from os import system
 lock=Lock()
 termcode='TERMINATE'
-checkstr='tryzSOCKTEST'
+checkstr='TryzSOCKTEST'
 defport=45565
-
-en=lambda s: print(s, enumerate())
 
 class server(Thread):
     def __init__(self, *args): #first argument be port to host server
@@ -21,33 +19,32 @@ class server(Thread):
             for x in range(45565, 55565):
                 try:
                     self.sock.bind(('', x))
+                    self.port=x
                     break
                 except Exception as e: pass#print(e)
-                finally: self.port=x
         if len(args)==1:
             self.port=args[0]
-            self.sock.bind((gethostbyname(gethostname()), self.port))
+            self.sock.bind(('', self.port))
         with lock: print('Connect to Master IP : %s'%gethostbyname(gethostname()))#, self.port))
-            
     def run(self):
         serverclient=client(gethostbyname(gethostname()), self.port).start() #starts a client for the master user as well
         message=''
         while True:
-            #print('entered server loop')###'''
+#            print('entered server loop')###'''
             data, addr=self.sock.recvfrom(1024)
-            #print('received message')###'''
+#            print('received message')###'''
             if str(data)[2:2+len(checkstr)]==checkstr: #for client initialization and confirmation
-                #print('checkstring detected')###'''
+#                print('checkstring detected')###'''
                 self.sock.sendto(bytes(checkstr, 'utf-8'), addr)
                 #with lock: print('checkfrom', addr)###'''
                 continue
             elif addr not in self.clients:
-                #print('address registration')###'''
+#                print('address registration')###'''
                 self.clients.append(addr)
                 message=ctime()[11:-5]+' : CONNECTED < '+str(data)[2:-1]+' '+str(addr)###'''
 #                with lock: print(message)
             elif str(data)[2:2+len(termcode)]==termcode: #when users leave
-                #print('termcode detected')###'''
+#                print('termcode detected')###'''
                 self.clients.remove(addr)
                 message=ctime()[11:-5]+' : DISCONNECTED < '+str(data)[3+len(termcode):-1]+' '+str(addr)###
 #                with lock:print(message);#print(self.clients)
@@ -55,22 +52,26 @@ class server(Thread):
                 message=ctime()[11:-5]+' : '+str(data)[2:-1]#+' '+str(addr)###'''
 #                with lock: print(message)
             try:
-                #print('broadcasting messages')###'''
+#                print('broadcasting messages')###'''
                 for x in self.clients:
                     if x != addr:
                         self.sock.sendto(bytes(message, 'utf-8'), (x[0], x[1]+1))#initiate hostclient thread to send messages to clients.
             except Exception as e:print('Error while broadcast', e)
+            self.sock.close()
+            self.sock=socket(2, 2)
+            self.sock.bind(('', self.port))
             if not self.clients: break;
         try: serverclient.join(1.0)
         except: pass
-        self.sock.close()
+        try: self.sock.close()
+        except: pass
 
 class clientserver(Thread):
     def __init__(self, *args):#argument one to be port
         Thread.__init__(self)
         self.sock=socket(2, 2)
-        self.sock.bind((args[0], args[1]))
-        #print('clientserver initialized')
+        self.sock.bind(('', args[0]))
+        print('clientserver initialized : ', gethostbyname(gethostname()), args[0])
     def run(self):
         while True:
             data, addr=self.sock.recvfrom(1024)
@@ -83,8 +84,7 @@ class client(Thread):
         Thread.__init__(self)
         self.sock=socket(2, 2)
         self.username=input('Select a username : ')
-        system('cls')
-        print('Hello %s, Send messages to the network now. Send a blank text to Exit.\n'%self.username)
+        print('\nHello %s, Send messages to the network now. Send a blank text to Exit.\n'%self.username)
         if len(args)==1: self.ip=args[0]
         if len(args) in [0, 1]:
             for x in range(45565, 55565):
@@ -99,7 +99,7 @@ class client(Thread):
         self.sock.sendto(bytes(self.username, 'utf-8'), (self.ip, self.port))
     def run(self):
         #print('Connect host to \n IP : %s\nport: %d ...'%(gethostbyname(gethostname()), self.sock.getsockname()[1]+1))###
-        self.listener=clientserver(gethostbyname(gethostname()), self.sock.getsockname()[1]+1)
+        self.listener=clientserver(self.sock.getsockname()[1]+1)
         self.listener.start()
         while True:
             data=input()
