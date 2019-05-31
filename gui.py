@@ -101,6 +101,7 @@ class app(Frame):
         
     def themain(self):
         try:
+            self.root.focus_set()
             servorclient=simpledialog.askstring('Configure Master', 'Enter ip of Master\nPress Enter to start Master on this system', parent=self.root)
             if servorclient==None: quit()
             elif servorclient=='':pass
@@ -109,6 +110,7 @@ class app(Frame):
                 self.sock=socket(2, 2)
                 self.username=simpledialog.askstring('Username', 'Select a username', parent=self.root)
                 messagebox.showinfo('', 'Hello %s, Send messages to the network now. Send a blank text to Exit.\n'%self.username)
+                self.text2.focus_set()
 
                 for x in range(45565, 55565):
                     if servexists(self.sock, self.masterip, x, username=self.username, timeout=0.5):
