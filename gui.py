@@ -1,5 +1,9 @@
-from tkinter import *
-from tkinter import messagebox, simpledialog
+try:
+    from tkinter import *
+    from tkinter import messagebox, simpledialog
+except:
+    input('It appears, Tkinter Graphics is not installed into the python path. Please use the CLI version of this program.')
+    exit()
 from threading import Thread, Lock
 from socket import *
 from time import ctime, sleep
@@ -58,6 +62,7 @@ class app(Frame):
         except:pass
         try:self.listener.join(1.0)
         except:pass
+        self.destroy()
         quit()
     def clientinput(self, event):
         text=self.text2.get();
@@ -65,8 +70,7 @@ class app(Frame):
         self.text2.delete(0, len(text))
         self.output(text)
         if not text:
-            self.sock.sendto(bytes(termcode+' '+self.username, 
-                                  'utf-8'), (self.masterip,self.port))
+            self.sock.sendto(bytes(termcode+' '+self.username, 'utf-8'), (self.masterip,self.port))
             self.text2.config(state='disabled')
             #TERMINATE CLIENTSERVER
             self.sock.sendto(bytes(termcode, 'utf-8'), (gethostbyname(gethostname()), self.sock.getsockname()[1]+1))
@@ -128,8 +132,10 @@ class app(Frame):
 #            print('bleh')
             quit()
 try:
-    th=app(Tk())
+    theroot=Tk()
+    th=app(theroot)
     th.themain()
-    #th.join()
-    exit(input())
-except Exception as e:input(e)
+    th.pack()
+    theroot.mainloop()
+    exit()
+except Exception as e:print(e)
