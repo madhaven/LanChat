@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 try:
     from tkinter import *
     from tkinter import messagebox, simpledialog
@@ -171,7 +172,7 @@ class app(Frame):
             elif servorclient=='':
                 self.theserver=server();self.theserver.start()
                 self.masterip=self.theserver.CONNECTTOTHISIP
-                self.output('Connect to Master IP : %s'%self.masterip)
+                self.output('On Linux systems make sure that /etc/hosts does not contain 127.0.1.1 entries\nConnect clients to Master IP : %s'%self.masterip)
             self.sock=socket(2, 2)
             self.username=simpledialog.askstring('Username', 'Select a username', parent=self.root)
             messagebox.showinfo('', 'Hello %s, Send messages to the network now. Send a blank text to Exit.\n'%self.username)

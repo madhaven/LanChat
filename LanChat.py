@@ -1,3 +1,4 @@
+#!/usr/bin/env python3 
 from threading import Thread, Lock
 from socket import *
 from time import ctime, sleep
@@ -25,7 +26,7 @@ class server(Thread):
         if len(args)==1:
             self.port=args[0]
             self.sock.bind(('', self.port))
-        with lock: print('Connect to Master IP : %s'%gethostbyname(gethostname()))#, self.port))
+        with lock: print('On Linux systems make sure that /etc/hosts does not contain 127.0.1.1 entries.\nConnect to Master IP : %s'%gethostbyname(gethostname()))#, self.port))
     def run(self):
         serverclient=client(gethostbyname(gethostname()), self.port).start() #starts a client for the master user as well
         message=''
