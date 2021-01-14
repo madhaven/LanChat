@@ -16,7 +16,7 @@ It uses socket programming python to connect to each instance.
 ![Disconnection](/screencaps/screencapscli_05.png)
 
 ## LanChat.pyw
-* the GUI version still needs some debugging. Although it could be used pretty well either way as of now.
+* the CLI version still needs some debugging. Although it could be used pretty well either way as of now.
 * On startup, the user is prompted for an ip. The user could also press enter and make the instance run as the central node.
 ![Initial prompt](/screencaps/screencapsgui_01.png)
 * Like the GUI version, the host/master is the central node and is necassary for all connections hence.
